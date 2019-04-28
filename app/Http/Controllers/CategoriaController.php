@@ -15,8 +15,30 @@ class CategoriaController extends Controller
     public function index(Request $request)
     {
         if(!$request->ajax()) return redirect('/');
-        $categorias = Categoria::all();
-        return $categorias;
+
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+
+        if($buscar == ''){
+            $categorias = Categoria::orderBy('id','desc')->paginate(3);
+        }else{
+            $categorias = Categoria::where($criterio,'like','%'.$buscar.'%')->orderBy('id','desc')->paginate(3);
+        }
+
+        
+
+        return [
+            'pagination' => [
+                'total'             => $categorias->total(),
+                'current_page'      => $categorias->currentPage(),
+                'per_page'          => $categorias->perPage(),
+                'last_page'         => $categorias->lastPage(),
+                'from'              => $categorias->firstItem(),
+                'to'                => $categorias->lastItem(),
+            ],
+
+            'categorias' => $categorias
+        ];
     }
 
     

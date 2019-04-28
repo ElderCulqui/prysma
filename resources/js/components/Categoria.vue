@@ -19,12 +19,12 @@
                 <div class="form-group row">
                     <div class="col-md-6">
                         <div class="input-group">
-                            <select class="form-control col-md-3">
-                    <option value="nombre">Categoría</option>
-                              <option value="descripcion">Descripción</option>
+                            <select class="form-control col-md-3" v-model="criterio">
+                                <option value="nombre">Categoría</option>
+                                <option value="descripcion">Descripción</option>
                             </select>
-                            <input type="text" class="form-control" placeholder="Buscar texto">
-                            <button type="submit"  class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                            <input type="text" @keyup.enter="listarCategoria(1,buscar,criterio);" v-model="buscar" class="form-control" placeholder="Buscar texto">
+                            <button type="submit" @click="listarCategoria(1,buscar,criterio);"  class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                         </div>
                     </div>
                 </div>
@@ -81,24 +81,15 @@
                 </table>
                 <nav>
                     <ul class="pagination">
-                        <li class="page-item">
-                            <a class="page-link" href="#">Anterior</a>
+                        <li class="page-item" v-if="pagination.current_page > 1">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Anterior</a>
                         </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
+                        <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">4</a>
-                        </li>
-                       
-                        <li class="page-item">
-                            <a class="page-link" href="#">Siguiente</a>
+                        
+                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                            <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Siguiente</a>
                         </li>
                     </ul>
                 </nav>
@@ -175,24 +166,79 @@
                 modal:0,
                 tipoAccion:0,
                 errorCategoria:0,
-                errorMostrarMsjCategoria:[]
+                errorMostrarMsjCategoria:[],
+                pagination:{
+                    'total': 0,
+                    'current_page': 0,
+                    'per_page': 0,
+                    'last_page': 0,
+                    'from': 0,
+                    'to': 0,
+                },
+                offset:3,
+                criterio: 'nombre',
+                buscar: ''
+
             }    
         },
 
+        computed:{
+            isActived: function(){
+                return this.pagination.current_page;
+            },
+
+            pagesNumber: function(){
+                if(!this.pagination.to){
+                    return[];
+                }
+
+                var from = this.pagination.current_page - this.offset;
+                if(from < 1){
+                    from = 1;
+                }
+
+                var to = from + (this.offset * 2);
+                if(to >= this.pagination.last_page){
+                    to = this.pagination.last_page;
+                }
+
+                var pagesArray = [];
+                while(from <= to){
+                    pagesArray.push(from);
+                    from++;
+                }
+
+                return pagesArray;
+
+            }
+        },
+
         methods:{
-            listarCategoria(){
+            listarCategoria(page,buscar,criterio){
 
                 let me=this;
 
-                axios.get('categoria').then(function (response) {
+                var url = 'categoria?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+
+                axios.get(url).then(function (response) {
                     // handle success
-                    console.log(response);
-                    me.arrayCategoria=response.data;
+                    // console.log(response);
+                    var respuesta = response.data;
+                    me.arrayCategoria = respuesta.categorias.data;
+                    me.pagination = respuesta.pagination;
                 })
                 .catch(function (error) {
                     // handle error
                     console.log(error);
                 })
+            },
+
+            cambiarPagina(page,buscar,criterio){
+                let me = this;
+
+                me.pagination.current_page = page;
+
+                me.listarCategoria(page,buscar,criterio);
             },
 
             registrarCategoria(){
@@ -210,7 +256,7 @@
                     // handle success
                     // console.log(response);
                     me.cerrarModal();
-                    me.listarCategoria();  
+                    me.listarCategoria(1,'','nombre');  
                 })
                 .catch(function (error) {
                     // handle error
@@ -233,7 +279,7 @@
                     // handle success
                     // console.log(response);
                     me.cerrarModal();
-                    me.listarCategoria();  
+                    me.listarCategoria(1,'','nombre');  
                 })
                 .catch(function (error) {
                     // handle error
@@ -263,7 +309,7 @@
                             'id':id
                         }).then(function (response) {
                             // handle success   
-                            me.listarCategoria(); 
+                            me.listarCategoria(1,'','nombre'); 
                             swalWithBootstrapButtons.fire(
                                 '¡Desactivado!',
                                 'El registro a sido desactivado con éxito',
@@ -306,7 +352,7 @@
                             'id':id
                         }).then(function (response) {
                             // handle success   
-                            me.listarCategoria(); 
+                            me.listarCategoria(1,'','nombre'); 
                             swalWithBootstrapButtons(
                                 '¡Activado!',
                                 'El registro a sido activado con éxito',
@@ -379,7 +425,7 @@
 
         mounted() {
             // console.log('Component mounted.')
-            this.listarCategoria();
+            this.listarCategoria(1,this.buscar,this.criterio);
         }
     }
 </script>
