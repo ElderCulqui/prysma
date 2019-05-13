@@ -16,9 +16,17 @@ class ProductoController extends Controller
         $criterio = $request->criterio;
 
         if($buscar == ''){
-            $productos = Producto::orderBy('id','desc')->paginate(3);
+            $productos = Producto::with('categoria')
+                                 ->orderBy('id','desc')
+                                 ->paginate(3);
         }else{
-            $productos = Producto::where($criterio,'like','%'.$buscar.'%')->orderBy('id','desc')->paginate(3);
+            $productos = Producto::with('categoria')
+                                 ->where($criterio,'like','%'.$buscar.'%')
+                                 ->orWhereHas('categoria',function($query) use ($criterio,$buscar){
+                                     $query->where($criterio,'like','%'.$buscar.'%');
+                                 })
+                                 ->orderBy('id','desc')
+                                 ->paginate(3);
         }
 
         
@@ -41,12 +49,11 @@ class ProductoController extends Controller
     {
         if(!$request->ajax()) return redirect('/');
         $producto = New Producto();
-        $producto->idcateogria = $request->idcateogria;
+        $producto->idcategoria = $request->idcategoria;
         $producto->codigo = $request->codigo;
         $producto->nombre = $request->nombre;
         $producto->precio_venta = $request->precio_venta;
         $producto->stock = $request->stock;
-        $producto->descripcion = $request->descripcion;
         $producto->condicion = '1';
         $producto->save();
     }
@@ -55,12 +62,11 @@ class ProductoController extends Controller
     {
         if(!$request->ajax()) return redirect('/');
         $producto = Producto::findOrFail($request->id);
-        $producto->idcateogria = $request->idcateogria;
+        $producto->idcategoria = $request->idcategoria;
         $producto->codigo = $request->codigo;
         $producto->nombre = $request->nombre;
         $producto->precio_venta = $request->precio_venta;
         $producto->stock = $request->stock;
-        $producto->descripcion = $request->descripcion;
         $producto->condicion = '1';
         $producto->save();
     }
