@@ -389,6 +389,7 @@
                 this.tituloModal="";
                 this.nombre="";
                 this.descripcion="";
+                this.errorCategoria=0;
             },
 
             abrirModal(modelo,accion,data=[]){
