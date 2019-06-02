@@ -35,4 +35,15 @@ class RolController extends Controller
             'roles' => $roles
         ];
     }
+
+    public function selectRol(Request $request){
+        
+        if(!$request->ajax()) return redirect('/');
+        $roles = Rol::select('id','nombre')
+                               ->where('condicion',1)
+                               ->orderBy('nombre','asc')
+                               ->get();
+        
+        return [ 'roles' => $roles ];
+    }
 }

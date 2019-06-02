@@ -86,4 +86,18 @@ class ProductoController extends Controller
         $producto->condicion = '0';
         $producto->save();
     }
+
+    public function buscarProducto(Request $request){
+        // return $request;
+        if(!$request->ajax()) return redirect('/');
+
+        $filtro = $request->filtro;
+        $productos = Producto::select('id','nombre')
+                            ->where('codigo',$filtro)
+                            ->orderBy('nombre','asc')
+                            ->take(1)
+                            ->get();
+        
+        return [ 'productos' => $productos ];
+    }
 }

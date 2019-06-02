@@ -83,6 +83,7 @@
                 rol_id:0,
                 nombre:'',
                 descripcion:'',
+                arrayRol:[],
                 pagination:{
                     'total': 0,
                     'current_page': 0,

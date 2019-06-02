@@ -73,7 +73,9 @@ class UserController extends Controller
         $usuario->telefono = $request->telefono;
         $usuario->email = $request->email;
         $usuario->usuario = $request->usuario;
-        $usuario->password = bcrypt($request->password);
+        if($request->password !== null || $request->password !== '' ){
+            $usuario->password = bcrypt($request->password);
+        }
         $usuario->condicion = 1;
         $usuario->save();
     }
