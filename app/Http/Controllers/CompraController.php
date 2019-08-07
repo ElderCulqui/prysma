@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Auth;
 use App\Compra;
 use App\DetalleCompra;
 use Carbon\Carbon;
@@ -64,7 +65,7 @@ class CompraController extends Controller
                 $compra->idusuario = Auth::user()->id;
                 $compra->tipo_identificacion = $request->tipo_identificacion;
                 $compra->num_compra = $request->num_compra;
-                $compra->fecha = $myTime->toDateString();
+                $compra->fecha_compra = $myTime->toDateString();
                 $compra->impuesto = $request->impuesto;
                 $compra->total = $request->total;
                 $compra->estado = 'Registrado';

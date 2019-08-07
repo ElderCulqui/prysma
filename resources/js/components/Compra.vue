@@ -140,7 +140,7 @@
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label class="text-uppercase"><strong>Tipo Identificacion(*)</strong></label>
-                                <select class="form-control" v-model="tipo_identificaion">
+                                <select class="form-control" v-model="tipo_identificacion">
                                     <option value="0">Seleccione</option>
                                     <option value="FACTURA">Factura</option>
                                     <option value="TICKET">Ticket</option>
@@ -171,7 +171,7 @@
                                 <label>Producto <span class="text-error" v-show="idproducto==0">(*Ingrese código del producto)</span></label>
                                 <div class="form-inline">
                                     <input type="text" class="form-control" v-model="codigo" @keyup.enter="buscarProducto()" placeholder="Ingrese Código">
-                                    <button @click="abriModal()" class="btn btn-primary">
+                                    <button @click="abrirModal()" class="btn btn-primary">
                                         <i class="fa fa-plus"></i>&nbsp; Agregar Productos
                                     </button>
                                     <input type="text" readonly class="form-control" v-model="producto">
@@ -278,17 +278,61 @@
                 </div>
                
                 <div class="modal-body">
-                    
-                    <div v-show="errorUsuario" class="form-group row div-error">
-                        
-                        <div class="text-center text-error">
-                            
-                            <div v-for="error in errorMostrarMsjUsuario" :key="error" v-text="error"></div>
-
+                    <div class="form-group row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <!-- <select class="form-control col-md-3" v-model="criterio">
+                                    <option value="nombre">Producto</option>
+                                    <option value="idcategoria">Categoría</option>
+                                </select> -->
+                                <input type="text" @keyup.enter="listarProducto(buscarP,criterioP);" v-model="buscarP" class="form-control" placeholder="Buscar por Producto o Categoría">
+                                <button type="submit" @click="listarProducto(buscarP,criterioP);"  class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                            </div>
                         </div>
-                    
                     </div>
-                     
+                    <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                    <thead>
+                        <tr class="bg-primary">
+                            <th>Categoria</th>
+                            <th>Producto</th>
+                            <th>Codigo</th>
+                            <th>Precio Venta (USD$)</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                        <tr v-for="producto in arrayProducto" :key="producto.id">
+                            
+                            <td v-text="producto.categoria.nombre"></td>
+                            <td v-text="producto.nombre"></td>
+                            <td v-text="producto.codigo"></td>
+                            <td v-text="producto.precio_venta"></td>
+                            <td v-text="producto.stock"></td>
+                            <td>
+                                <button type="button" class="btn btn-success btn-md" v-if="producto.condicion">
+                                  <i class="fa fa-check fa-2x"></i> Activo
+                                </button>
+                                <button type="button" class="btn btn-danger btn-md" v-else>
+                                  <i class="fa fa-check fa-2x"></i> Desactivado
+                                </button>
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn btn-info btn-md" @click="agregarDetalleModal(producto)">
+
+                                  <i class="fa fa-edit fa-2x"></i> Agregar
+                                </button> &nbsp;
+                            </td>
+
+                        </tr>
+                       
+                    </tbody>
+                </table>
+                    </div> 
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="cerrarModal()" class="btn btn-danger"><i class="fa fa-times fa-2x"></i> Cerrar</button>
@@ -342,6 +386,8 @@
                 offset:3,
                 criterio: 'num_compra',
                 buscar: '',
+                criterioP: 'nombre',
+                buscarP: '',
                 arrayProducto:[],
                 idproducto:0,
                 codigo:'',
@@ -424,39 +470,56 @@
             },
 
             mostrarDetalle(){
-                this.listado=0;
+
+                let me = this;
+
+                me.listado=0;
+                me.idproveedor=0;
+                me.tipo_identificacion = 'FACTURA';
+                me.num_compra = '';
+                me.impuesto = 0.18;  
+                me.total = 0.0;
+                me.idproducto = 0;
+                me.producto = '';
+                me.cantidad = 0;
+                me.precio = 0;
+                me.arrayDetalle = [];
             },
 
             ocultarDetalle(){
                 this.listado=1;
             },
 
-            registrarUsuario(){
+            registrarCompra(){
 
-                if(this.validarUsuario()){
+                if(this.validarCompra()){
                     return;
                 }
 
                 let me=this;
 
-                axios.post('usuario/registrar',{
-                    'idrol':this.idrol,
-                    'nombre':this.nombre,
-                    'tipo_documento':this.tipo_documento,
-                    'num_documento':this.num_documento,
-                    'direccion':this.direccion,
-                    'telefono':this.telefono,
-                    'email':this.email,
-                    'usuario':this.usuario,
-                    'password':this.password,
+                axios.post('compra/registrar',{
+                    'idproveedor':this.idproveedor,
+                    'tipo_identificacion':this.tipo_identificacion,
+                    'num_compra':this.num_compra,
+                    'impuesto':this.impuesto,
+                    'total':this.total,
+                    'data':this.arrayDetalle
                 }).then(function (response) {
-                    // handle success
-                    // console.log(response);
-                    me.cerrarModal();
-                    me.listarUsuario(1,'','nombre');  
+                    me.listado = 1;
+                    me.listarCompra(1,'','num_compra');
+                    me.idproveedor=0;
+                    me.tipo_identificacion = 'FACTURA';
+                    me.num_compra = '';
+                    me.impuesto = 0.18;  
+                    me.total = 0.0;
+                    me.idproducto = 0;
+                    me.producto = '';
+                    me.cantidad = 0;
+                    me.precio = 0;
+                    me.arrayDetalle = [];
                 })
                 .catch(function (error) {
-                    // handle error
                     console.log(error);
                 })
             },
@@ -580,6 +643,43 @@
                 me.arrayDetalle.splice(index,1);
             },
 
+            agregarDetalleModal(data=[]){
+                let me = this;
+
+                if(me.encuentra(data['id'])){
+                    swal({
+                        type: 'error',
+                        title: 'Error...',
+                        text: 'Ese producto ya fue agregado'
+                    })
+                }else{
+                    me.arrayDetalle.push({
+                        idproducto: data['id'],
+                        producto: data['nombre'],
+                        cantidad: 1,
+                        precio: 1
+                    })
+                }
+            },
+
+            listarProducto(buscar,criterio){
+
+                let me=this;
+
+                var url = 'producto/listarProducto?buscar=' + buscar + '&criterio=' + criterio;
+
+                axios.get(url).then(function (response) {
+                    // handle success
+                    // console.log(response);
+                    var respuesta = response.data;
+                    me.arrayProducto = respuesta.productos.data;
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+            },
+
             desactivarUsuario(id){
                 const swalWithBootstrapButtons = Swal.mixin({
                         confirmButtonClass: 'btn btn-success',
@@ -666,79 +766,32 @@
                 })
             },
 
-            validarUsuario(){
-                this.errorUsuario=0;
-                this.errorMostrarMsjUsuario=[];
+            validarCompra(){
+                this.errorCompra=0;
+                this.errorMostrarMsjCompra=[];
 
-                if(!this.nombre) this.errorMostrarMsjUsuario.push("(*)El nombre no puede estar vacío");
-                if(!this.idrol) this.errorMostrarMsjUsuario.push("(*)El rol no puede estar vacío");
-                if(!this.tipo_documento) this.errorMostrarMsjUsuario.push("(*)El tipo de documento del Usuario no puede estar vacío");
-                if(!this.num_documento) this.errorMostrarMsjUsuario.push("(*)El numero de documento del Usuario no puede estar vacío");
-                if(!this.usuario) this.errorMostrarMsjUsuario.push("(*)El usuario no puede estar vacío");
-                if(this.errorMostrarMsjUsuario.length) this.errorUsuario=1;
+                if(this.idproveedor == 0) this.errorMostrarMsjCompra.push("(*)El proveedor no puede estar vacío");
+                if(this.tipo_identificacion == 0) this.errorMostrarMsjCompra.push("(*)El tipo de identificacion no puede estar vacío");
+                if(!this.num_compra) this.errorMostrarMsjCompra.push("(*)El número de la Compra no puede estar vacío");
+                if(!this.impuesto) this.errorMostrarMsjCompra.push("(*)El impuesto de la Compra no puede estar vacío");
+                if(this.arrayDetalle.length <= 0) this.errorMostrarMsjCompra.push("(*)El detalle de la Compra no puede estar vacío");
+                
+                if(this.errorMostrarMsjCompra.length) this.errorCompra=1;
 
-                return this.errorUsuario;
+                return this.errorCompra;
             },
 
             cerrarModal(){
                 this.modal=0;
                 this.tituloModal="";
-                this.nombre="";
-                this.tipo_documento="DNI";
-                this.nun_documento=""; 
-                this.direccion="";
-                this.telefono="";
-                this.email="";
-                this.password="";
-                this.usuario="";
-                this.idrol="";
-                this.errorUsuario=0;
             },
 
-            abrirModal(modelo,accion,data=[]){
-                switch(modelo){
-                    case "usuario":
-                    {
-                        switch(accion){
-                            case "registrar":
-                            {
-                                this.modal=1;
-                                this.tituloModal="Registrar Usuario";
-                                this.tipoAccion=1;
-                                this.idrol="";
-                                this.nombre="";
-                                this.tipo_documento="DNI";
-                                this.num_documento="";
-                                this.direccion="";
-                                this.telefono="";
-                                this.email="";
-                                this.usuario="";
-                                this.password="";
-                                break;
-                            }
-
-                            case "actualizar":
-                            {
-                                // console.log(data);
-                                this.modal=1;
-                                this.tituloModal="Editar Usuario";
-                                this.tipoAccion=2;
-                                this.proveedor_id=data['id'];
-                                this.idrol=data['idrol'];
-                                this.nombre=data['nombre'];
-                                this.tipo_documento=data['tipo_documento'];
-                                this.num_documento=data['num_documento'];
-                                this.direccion=data['direccion'];
-                                this.telefono=data['telefono'];
-                                this.email=data['email'];
-                                this.usuario=data['usuario'];
-                                this.password=data['password'];
-                                break;
-                            }   
-                        }
-                    }
-                }
-                this.selectRol();
+            abrirModal(){
+                    this.arrayProducto = [];
+                    this.buscarP = '';
+                    this.modal=1;
+                    this.tituloModal="Seleccione uno o varios productos";
+                    
             }
         },
 

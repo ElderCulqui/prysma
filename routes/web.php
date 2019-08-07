@@ -38,6 +38,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/producto/desactivar', 'ProductoController@desactivar');
         Route::put('/producto/activar', 'ProductoController@activar');
         Route::get('/producto/buscarProducto', 'ProductoController@buscarProducto');
+        Route::get('/producto/listarProducto', 'ProductoController@listarProducto');
     });
     
     Route::group(['middleware' => ['Comprador','Administrador']], function () {
@@ -49,7 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/proveedor/selectProveedor', 'ProveedorController@selectProveedor');
 
         Route::get('/compra', 'CompraController@index');
-        Route::get('/compra/registrar', 'CompraController@store');
+        Route::post('/compra/registrar', 'CompraController@store');
         Route::get('/compra/desactivar', 'CompraController@desactivar');
     });
 

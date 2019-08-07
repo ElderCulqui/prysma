@@ -100,4 +100,28 @@ class ProductoController extends Controller
         
         return [ 'productos' => $productos ];
     }
+
+    public function listarProducto(Request $request){
+        
+        if(!$request->ajax()) return redirect('/');
+
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+
+        if($buscar == ''){
+            $productos = Producto::with('categoria')
+                                 ->orderBy('id','desc')
+                                 ->paginate(10);
+        }else{
+            $productos = Producto::with('categoria')
+                                 ->where($criterio,'like','%'.$buscar.'%')
+                                 ->orWhereHas('categoria',function($query) use ($criterio,$buscar){
+                                     $query->where($criterio,'like','%'.$buscar.'%');
+                                 })
+                                 ->orderBy('id','desc')
+                                 ->paginate(10);
+        }
+
+        return ['productos' => $productos];
+    }
 }

@@ -113,7 +113,6 @@ var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/
 var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ "./node_modules/axios/lib/helpers/parseHeaders.js");
 var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ "./node_modules/axios/lib/helpers/isURLSameOrigin.js");
 var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/axios/lib/core/createError.js");
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(/*! ./../helpers/btoa */ "./node_modules/axios/lib/helpers/btoa.js");
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -125,22 +124,6 @@ module.exports = function xhrAdapter(config) {
     }
 
     var request = new XMLHttpRequest();
-    var loadEvent = 'onreadystatechange';
-    var xDomain = false;
-
-    // For IE 8/9 CORS support
-    // Only supports POST and GET calls and doesn't returns the response headers.
-    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ( true &&
-        typeof window !== 'undefined' &&
-        window.XDomainRequest && !('withCredentials' in request) &&
-        !isURLSameOrigin(config.url)) {
-      request = new window.XDomainRequest();
-      loadEvent = 'onload';
-      xDomain = true;
-      request.onprogress = function handleProgress() {};
-      request.ontimeout = function handleTimeout() {};
-    }
 
     // HTTP basic authentication
     if (config.auth) {
@@ -155,8 +138,8 @@ module.exports = function xhrAdapter(config) {
     request.timeout = config.timeout;
 
     // Listen for ready state
-    request[loadEvent] = function handleLoad() {
-      if (!request || (request.readyState !== 4 && !xDomain)) {
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
         return;
       }
 
@@ -173,9 +156,8 @@ module.exports = function xhrAdapter(config) {
       var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
       var response = {
         data: responseData,
-        // IE sends 1223 instead of 204 (https://github.com/axios/axios/issues/201)
-        status: request.status === 1223 ? 204 : request.status,
-        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+        status: request.status,
+        statusText: request.statusText,
         headers: responseHeaders,
         config: config,
         request: request
@@ -984,54 +966,6 @@ module.exports = function bind(fn, thisArg) {
     return fn.apply(thisArg, args);
   };
 };
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/btoa.js":
-/*!************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/btoa.js ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-
-var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-
-function E() {
-  this.message = 'String contains an invalid character';
-}
-E.prototype = new Error;
-E.prototype.code = 5;
-E.prototype.name = 'InvalidCharacterError';
-
-function btoa(input) {
-  var str = String(input);
-  var output = '';
-  for (
-    // initialize result and counter
-    var block, charCode, idx = 0, map = chars;
-    // if the next str index does not exist:
-    //   change the mapping table to "="
-    //   check if d has no fractional digits
-    str.charAt(idx | 0) || (map = '=', idx % 1);
-    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-  ) {
-    charCode = str.charCodeAt(idx += 3 / 4);
-    if (charCode > 0xFF) {
-      throw new E();
-    }
-    block = block << 8 | charCode;
-  }
-  return output;
-}
-
-module.exports = btoa;
 
 
 /***/ }),
@@ -2844,6 +2778,50 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2878,6 +2856,8 @@ __webpack_require__.r(__webpack_exports__);
       offset: 3,
       criterio: 'num_compra',
       buscar: '',
+      criterioP: 'nombre',
+      buscarP: '',
       arrayProducto: [],
       idproducto: 0,
       codigo: '',
@@ -2950,34 +2930,49 @@ __webpack_require__.r(__webpack_exports__);
       me.listarCompra(page, buscar, criterio);
     },
     mostrarDetalle: function mostrarDetalle() {
-      this.listado = 0;
+      var me = this;
+      me.listado = 0;
+      me.idproveedor = 0;
+      me.tipo_identificacion = 'FACTURA';
+      me.num_compra = '';
+      me.impuesto = 0.18;
+      me.total = 0.0;
+      me.idproducto = 0;
+      me.producto = '';
+      me.cantidad = 0;
+      me.precio = 0;
+      me.arrayDetalle = [];
     },
     ocultarDetalle: function ocultarDetalle() {
       this.listado = 1;
     },
-    registrarUsuario: function registrarUsuario() {
-      if (this.validarUsuario()) {
+    registrarCompra: function registrarCompra() {
+      if (this.validarCompra()) {
         return;
       }
 
       var me = this;
-      axios.post('usuario/registrar', {
-        'idrol': this.idrol,
-        'nombre': this.nombre,
-        'tipo_documento': this.tipo_documento,
-        'num_documento': this.num_documento,
-        'direccion': this.direccion,
-        'telefono': this.telefono,
-        'email': this.email,
-        'usuario': this.usuario,
-        'password': this.password
+      axios.post('compra/registrar', {
+        'idproveedor': this.idproveedor,
+        'tipo_identificacion': this.tipo_identificacion,
+        'num_compra': this.num_compra,
+        'impuesto': this.impuesto,
+        'total': this.total,
+        'data': this.arrayDetalle
       }).then(function (response) {
-        // handle success
-        // console.log(response);
-        me.cerrarModal();
-        me.listarUsuario(1, '', 'nombre');
+        me.listado = 1;
+        me.listarCompra(1, '', 'num_compra');
+        me.idproveedor = 0;
+        me.tipo_identificacion = 'FACTURA';
+        me.num_compra = '';
+        me.impuesto = 0.18;
+        me.total = 0.0;
+        me.idproducto = 0;
+        me.producto = '';
+        me.cantidad = 0;
+        me.precio = 0;
+        me.arrayDetalle = [];
       })["catch"](function (error) {
-        // handle error
         console.log(error);
       });
     },
@@ -3088,6 +3083,38 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       me.arrayDetalle.splice(index, 1);
     },
+    agregarDetalleModal: function agregarDetalleModal() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var me = this;
+
+      if (me.encuentra(data['id'])) {
+        swal({
+          type: 'error',
+          title: 'Error...',
+          text: 'Ese producto ya fue agregado'
+        });
+      } else {
+        me.arrayDetalle.push({
+          idproducto: data['id'],
+          producto: data['nombre'],
+          cantidad: 1,
+          precio: 1
+        });
+      }
+    },
+    listarProducto: function listarProducto(buscar, criterio) {
+      var me = this;
+      var url = 'producto/listarProducto?buscar=' + buscar + '&criterio=' + criterio;
+      axios.get(url).then(function (response) {
+        // handle success
+        // console.log(response);
+        var respuesta = response.data;
+        me.arrayProducto = respuesta.productos.data;
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      });
+    },
     desactivarUsuario: function desactivarUsuario(id) {
       var _this = this;
 
@@ -3152,78 +3179,26 @@ __webpack_require__.r(__webpack_exports__);
         result.dismiss === Swal.DismissReason.cancel) {}
       });
     },
-    validarUsuario: function validarUsuario() {
-      this.errorUsuario = 0;
-      this.errorMostrarMsjUsuario = [];
-      if (!this.nombre) this.errorMostrarMsjUsuario.push("(*)El nombre no puede estar vacío");
-      if (!this.idrol) this.errorMostrarMsjUsuario.push("(*)El rol no puede estar vacío");
-      if (!this.tipo_documento) this.errorMostrarMsjUsuario.push("(*)El tipo de documento del Usuario no puede estar vacío");
-      if (!this.num_documento) this.errorMostrarMsjUsuario.push("(*)El numero de documento del Usuario no puede estar vacío");
-      if (!this.usuario) this.errorMostrarMsjUsuario.push("(*)El usuario no puede estar vacío");
-      if (this.errorMostrarMsjUsuario.length) this.errorUsuario = 1;
-      return this.errorUsuario;
+    validarCompra: function validarCompra() {
+      this.errorCompra = 0;
+      this.errorMostrarMsjCompra = [];
+      if (this.idproveedor == 0) this.errorMostrarMsjCompra.push("(*)El proveedor no puede estar vacío");
+      if (this.tipo_identificacion == 0) this.errorMostrarMsjCompra.push("(*)El tipo de identificacion no puede estar vacío");
+      if (!this.num_compra) this.errorMostrarMsjCompra.push("(*)El número de la Compra no puede estar vacío");
+      if (!this.impuesto) this.errorMostrarMsjCompra.push("(*)El impuesto de la Compra no puede estar vacío");
+      if (this.arrayDetalle.length <= 0) this.errorMostrarMsjCompra.push("(*)El detalle de la Compra no puede estar vacío");
+      if (this.errorMostrarMsjCompra.length) this.errorCompra = 1;
+      return this.errorCompra;
     },
     cerrarModal: function cerrarModal() {
       this.modal = 0;
       this.tituloModal = "";
-      this.nombre = "";
-      this.tipo_documento = "DNI";
-      this.nun_documento = "";
-      this.direccion = "";
-      this.telefono = "";
-      this.email = "";
-      this.password = "";
-      this.usuario = "";
-      this.idrol = "";
-      this.errorUsuario = 0;
     },
-    abrirModal: function abrirModal(modelo, accion) {
-      var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-
-      switch (modelo) {
-        case "usuario":
-          {
-            switch (accion) {
-              case "registrar":
-                {
-                  this.modal = 1;
-                  this.tituloModal = "Registrar Usuario";
-                  this.tipoAccion = 1;
-                  this.idrol = "";
-                  this.nombre = "";
-                  this.tipo_documento = "DNI";
-                  this.num_documento = "";
-                  this.direccion = "";
-                  this.telefono = "";
-                  this.email = "";
-                  this.usuario = "";
-                  this.password = "";
-                  break;
-                }
-
-              case "actualizar":
-                {
-                  // console.log(data);
-                  this.modal = 1;
-                  this.tituloModal = "Editar Usuario";
-                  this.tipoAccion = 2;
-                  this.proveedor_id = data['id'];
-                  this.idrol = data['idrol'];
-                  this.nombre = data['nombre'];
-                  this.tipo_documento = data['tipo_documento'];
-                  this.num_documento = data['num_documento'];
-                  this.direccion = data['direccion'];
-                  this.telefono = data['telefono'];
-                  this.email = data['email'];
-                  this.usuario = data['usuario'];
-                  this.password = data['password'];
-                  break;
-                }
-            }
-          }
-      }
-
-      this.selectRol();
+    abrirModal: function abrirModal() {
+      this.arrayProducto = [];
+      this.buscarP = '';
+      this.modal = 1;
+      this.tituloModal = "Seleccione uno o varios productos";
     }
   },
   mounted: function mounted() {
@@ -7711,19 +7686,9 @@ function toComment(sourceMap) {
  * @license  MIT
  */
 
-// The _isBuffer check is for Safari 5-7 support, because it's missing
-// Object.prototype.constructor. Remove this eventually
-module.exports = function (obj) {
-  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-}
-
-function isBuffer (obj) {
-  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
-
-// For Node v0.10 support. Remove this eventually.
-function isSlowBuffer (obj) {
-  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+module.exports = function isBuffer (obj) {
+  return obj != null && obj.constructor != null &&
+    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
 }
 
 
@@ -11565,7 +11530,7 @@ exports.default = SVGRenderer;
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -11576,7 +11541,7 @@ exports.default = SVGRenderer;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.11';
+  var VERSION = '4.17.15';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -14235,16 +14200,10 @@ exports.default = SVGRenderer;
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-
-        return result;
-      }
-
-      if (isMap(value)) {
+      } else if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
-
-        return result;
       }
 
       var keysFunc = isFull
@@ -15168,8 +15127,8 @@ exports.default = SVGRenderer;
         return;
       }
       baseFor(source, function(srcValue, key) {
+        stack || (stack = new Stack);
         if (isObject(srcValue)) {
-          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -16986,7 +16945,7 @@ exports.default = SVGRenderer;
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision) {
+        if (precision && nativeIsFinite(number)) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -18169,7 +18128,7 @@ exports.default = SVGRenderer;
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__".
+     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
      *
      * @private
      * @param {Object} object The object to query.
@@ -18177,6 +18136,10 @@ exports.default = SVGRenderer;
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
+      if (key === 'constructor' && typeof object[key] === 'function') {
+        return;
+      }
+
       if (key == '__proto__') {
         return;
       }
@@ -21977,6 +21940,7 @@ exports.default = SVGRenderer;
           }
           if (maxing) {
             // Handle invocations in a tight loop.
+            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -26363,9 +26327,12 @@ exports.default = SVGRenderer;
       , 'g');
 
       // Use a sourceURL for easier debugging.
+      // The sourceURL gets injected into the source that's eval-ed, so be careful
+      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
+      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
       var sourceURL = '//# sourceURL=' +
-        ('sourceURL' in options
-          ? options.sourceURL
+        (hasOwnProperty.call(options, 'sourceURL')
+          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -26398,7 +26365,9 @@ exports.default = SVGRenderer;
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      var variable = options.variable;
+      // Like with sourceURL, we take care to not check the option's prototype,
+      // as this configuration is a code injection vector.
+      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -28603,10 +28572,11 @@ exports.default = SVGRenderer;
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = (lodashFunc.name + ''),
-            names = realNames[key] || (realNames[key] = []);
-
-        names.push({ 'name': methodName, 'func': lodashFunc });
+        var key = lodashFunc.name + '';
+        if (!hasOwnProperty.call(realNames, key)) {
+          realNames[key] = [];
+        }
+        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -31788,8 +31758,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.tipo_identificaion,
-                                expression: "tipo_identificaion"
+                                value: _vm.tipo_identificacion,
+                                expression: "tipo_identificacion"
                               }
                             ],
                             staticClass: "form-control",
@@ -31803,7 +31773,7 @@ var render = function() {
                                     var val = "_value" in o ? o._value : o.value
                                     return val
                                   })
-                                _vm.tipo_identificaion = $event.target.multiple
+                                _vm.tipo_identificacion = $event.target.multiple
                                   ? $$selectedVal
                                   : $$selectedVal[0]
                               }
@@ -31958,7 +31928,7 @@ var render = function() {
                               staticClass: "btn btn-primary",
                               on: {
                                 click: function($event) {
-                                  return _vm.abriModal()
+                                  return _vm.abrirModal()
                                 }
                               }
                             },
@@ -32400,33 +32370,174 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
-                _c(
-                  "div",
-                  {
-                    directives: [
-                      {
-                        name: "show",
-                        rawName: "v-show",
-                        value: _vm.errorUsuario,
-                        expression: "errorUsuario"
-                      }
-                    ],
-                    staticClass: "form-group row div-error"
-                  },
-                  [
-                    _c(
-                      "div",
-                      { staticClass: "text-center text-error" },
-                      _vm._l(_vm.errorMostrarMsjUsuario, function(error) {
-                        return _c("div", {
-                          key: error,
-                          domProps: { textContent: _vm._s(error) }
-                        })
+                _c("div", { staticClass: "form-group row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "input-group" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.buscarP,
+                            expression: "buscarP"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          placeholder: "Buscar por Producto o Categoría"
+                        },
+                        domProps: { value: _vm.buscarP },
+                        on: {
+                          keyup: function($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.listarProducto(
+                              _vm.buscarP,
+                              _vm.criterioP
+                            )
+                          },
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.buscarP = $event.target.value
+                          }
+                        }
                       }),
-                      0
-                    )
-                  ]
-                )
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "submit" },
+                          on: {
+                            click: function($event) {
+                              return _vm.listarProducto(
+                                _vm.buscarP,
+                                _vm.criterioP
+                              )
+                            }
+                          }
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-search" }),
+                          _vm._v(" Buscar")
+                        ]
+                      )
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "table-responsive" }, [
+                  _c(
+                    "table",
+                    {
+                      staticClass: "table table-bordered table-striped table-sm"
+                    },
+                    [
+                      _vm._m(13),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        _vm._l(_vm.arrayProducto, function(producto) {
+                          return _c("tr", { key: producto.id }, [
+                            _c("td", {
+                              domProps: {
+                                textContent: _vm._s(producto.categoria.nombre)
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: { textContent: _vm._s(producto.nombre) }
+                            }),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: { textContent: _vm._s(producto.codigo) }
+                            }),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: {
+                                textContent: _vm._s(producto.precio_venta)
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: { textContent: _vm._s(producto.stock) }
+                            }),
+                            _vm._v(" "),
+                            _c("td", [
+                              producto.condicion
+                                ? _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-success btn-md",
+                                      attrs: { type: "button" }
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "fa fa-check fa-2x"
+                                      }),
+                                      _vm._v(
+                                        " Activo\n                                "
+                                      )
+                                    ]
+                                  )
+                                : _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-danger btn-md",
+                                      attrs: { type: "button" }
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "fa fa-check fa-2x"
+                                      }),
+                                      _vm._v(
+                                        " Desactivado\n                                "
+                                      )
+                                    ]
+                                  )
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-info btn-md",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.agregarDetalleModal(producto)
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("i", { staticClass: "fa fa-edit fa-2x" }),
+                                  _vm._v(
+                                    " Agregar\n                                "
+                                  )
+                                ]
+                              ),
+                              _vm._v("  \n                            ")
+                            ])
+                          ])
+                        }),
+                        0
+                      )
+                    ]
+                  )
+                ])
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "modal-footer" }, [
@@ -32637,6 +32748,28 @@ var staticRenderFns = [
         _vm._v(
           "\n                                            No se han agregado productos\n                                        "
         )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", { staticClass: "bg-primary" }, [
+        _c("th", [_vm._v("Categoria")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Producto")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Codigo")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Precio Venta (USD$)")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Stock")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Estado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Acción")])
       ])
     ])
   }
@@ -48230,7 +48363,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\prysma\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /var/www/html/prysma/resources/js/app.js */"./resources/js/app.js");
 
 
 /***/ })
