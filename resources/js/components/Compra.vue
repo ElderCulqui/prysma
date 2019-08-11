@@ -8,7 +8,7 @@
         <!-- Ejemplo de tabla Listado -->
         <div class="card">
             <!-- Listado de Compras -->
-            <template v-if="listado">
+            <template v-if="listado==1">
                 <div class="card-header">
                 <h2>Listado de Compras</h2><br/>
                     <button class="btn btn-primary btn-lg" type="button" @click="mostrarDetalle()">
@@ -30,69 +30,70 @@
                             </div>
                         </div>
                     </div>
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr class="bg-primary">
+                    <div class="table-responsive col-md-12">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr class="bg-primary">
+                                    <th>Ver Detalle</th>
+                                    <th>Fecha Compra</th>
+                                    <th>Número Compra</th>
+                                    <th>Proveedor</th>
+                                    <th>Tipo Identificación</th>
+                                    <th>Comprador</th>
+                                    <th>Total (S/.)</th>
+                                    <th>Impuesto</th>
+                                    <th>Estado</th>
+                                    <th>Cambiar Estado</th>
+                                    <th>Descargar Reporte</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                             
-                                <th>Ver Detalle</th>
-                                <th>Fecha Compra</th>
-                                <th>Número Compra</th>
-                                <th>Proveedor</th>
-                                <th>Tipo Identificación</th>
-                                <th>Comprador</th>
-                                <th>Total (S/.)</th>
-                                <th>Impuesto</th>
-                                <th>Estado</th>
-                                <th>Cambiar Estado</th>
-                                <th>Descargar Reporte</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        
-                            <tr v-for="compra in arrayCompra" :key="compra.id">
-                                
-                                <td>
-                                    <button type="button" @click="verCompra(compra.id)" class="btn btn-warning btn-md">
-                                        <i class="fa fa-eye fa-2x"></i> Ver Detalle
-                                    </button> &nbsp;
-                                </td>
-                                <td v-text="compra.fecha_compra"></td>
-                                <td v-text="compra.num_compra"></td>
-                                <td v-text="compra.proveedor.nombre"></td>
-                                <td v-text="compra.tipo_identificacion"></td>
-                                <td v-text="compra.usuario.nombre"></td>
-                                <td v-text="compra.total"></td>
-                                <td v-text="compra.impuesto"></td>
-                                <td>
-                                    <button type="button" class="btn btn-success btn-md" v-if="compra.estado=='Registrado'">
-                                    <i class="fa fa-check fa-2x"></i> Registrado
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-md" v-else>
-                                    <i class="fa fa-check fa-2x"></i> Anulado
-                                    </button>
-                                </td>
-                                <td>
-                                    <template v-if="compra.estado=='Registrado'">
-                                        <button type="button" class="btn btn-danger btn-sm" @click="desactivarCompra(compra.id)">
-                                            <i class="fa fa-lock fa-2x"></i> Anular Compra
+                                <tr v-for="compra in arrayCompra" :key="compra.id">
+                                    
+                                    <td>
+                                        <button type="button" @click="verCompra(compra.id)" class="btn btn-warning btn-md">
+                                            <i class="fa fa-eye fa-2x"></i> Ver Detalle
+                                        </button> &nbsp;
+                                    </td>
+                                    <td v-text="compra.fecha_compra"></td>
+                                    <td v-text="compra.num_compra"></td>
+                                    <td v-text="compra.proveedor.nombre"></td>
+                                    <td v-text="compra.tipo_identificacion"></td>
+                                    <td v-text="compra.usuario.nombre"></td>
+                                    <td v-text="compra.total"></td>
+                                    <td v-text="compra.impuesto"></td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-md" v-if="compra.estado=='Registrado'">
+                                        <i class="fa fa-check fa-2x"></i> Registrado
                                         </button>
-                                    </template>
-                                    <template v-else>
-                                        <button type="button" class="btn btn-success btn-sm">
-                                            <i class="fa fa-lock fa-2x"></i> Cambiado
+                                        <button type="button" class="btn btn-danger btn-md" v-else>
+                                        <i class="fa fa-check fa-2x"></i> Anulado
                                         </button>
-                                    </template>
-                                </td>
-                                <td>
-                                    <button type="button" @click="pdfCompra(compra.id)" class="btn btn-info btn-sm">
-                                        <i class="fa fa-file fa-2x"></i> Descargar PDF
-                                    </button> &nbsp;
-                                </td>
+                                    </td>
+                                    <td>
+                                        <template v-if="compra.estado=='Registrado'">
+                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarCompra(compra.id)">
+                                                <i class="fa fa-check fa-2x"></i> Anular Compra
+                                            </button>
+                                        </template>
+                                        <template v-else>
+                                            <button type="button" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-check fa-2x"></i> Cambiado
+                                            </button>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <button type="button" @click="pdfCompra(compra.id)" class="btn btn-info btn-sm">
+                                            <i class="fa fa-file fa-2x"></i> Descargar PDF
+                                        </button> &nbsp;
+                                    </td>
 
-                            </tr>
-                        
-                        </tbody>
-                    </table>
+                                </tr>
+                            
+                            </tbody>
+                        </table>
+                    </div>
                     <nav>
                         <ul class="pagination">
                             <li class="page-item" v-if="pagination.current_page > 1">
@@ -112,7 +113,7 @@
             <!-- Fin Listado Compras-->
             
             <!-- Detalle Compras -->
-            <template v-else>
+            <template v-else-if="listado==0">
                 <span><strong>(*) Campo Obligatorio</strong></span><br>
                 <h3 class="text-center">Llenar el Formulario</h3>
                 <div class="card-body">
@@ -263,6 +264,92 @@
                 </div>    
             </template>
             <!-- Fin Detalle Compras -->
+
+            <!-- Ver Compra -->
+            <template v-else-if="listado==2">
+                <h2 class="text-center">Detalle Compra</h2>
+                <div class="card-body">
+                    <div class="form-group row border">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="text-uppercase"><strong>Proveedor</strong></label>
+                                <p v-text="proveedor"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="text-uppercase"><strong>Tipo Documento</strong></label>
+                                <p v-text="tipo_identificacion"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="text-uppercase"><strong>Número Compra</strong></label>
+                                <p v-text="num_compra"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="" class="text-uppercase"><strong>Impuesto</strong></label>
+                                <p v-text="impuesto"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row border">
+                        <div class="table-responsive col-md-12">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr class="bg-success">
+                                        <th>Producto</th>
+                                        <th>Precio (S/.)</th>
+                                        <th>Cantidad</th>
+                                        <th>Total (S/.)</th>   
+                                    </tr>
+                                </thead>
+                                <tbody v-if="arrayDetalle.length">
+                                    <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                        <td v-text="detalle.productos.nombre"></td>
+                                        <td v-text="detalle.precio"></td>
+                                        <td v-text="detalle.cantidad"></td>
+                                        <td>
+                                            {{ detalle.precio * detalle.cantidad }}
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: grey;">
+                                        <td colspan="3" align="right"><strong>Sub-Total:</strong></td>
+                                        <td><strong>S/.{{ subTotal=(total-subTotalImpuesto).toFixed(2) }}</strong></td>
+                                    </tr>
+                                    <tr style="background-color: grey;">
+                                        <td colspan="3" align="right"><strong>Impuesto:</strong></td>
+                                        <td><strong>S/.{{ subTotalImpuesto=((total*impuesto)/(1+impuesto)).toFixed(2) }}</strong></td>
+                                    </tr>
+                                    <tr style="background-color: grey;">
+                                        <td colspan="3" align="right"><strong>Total:</strong></td>
+                                        <td><strong>S/.{{total}}</strong></td>
+                                    </tr>
+                                </tbody>
+                                <tbody v-else>
+                                    <tr>
+                                        <td colspan="4">
+                                            No se han agregado productos
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div align="right">
+                                <button type="button" @click="ocultarDetalle()" class="btn btn-danger">
+                                    <i class="fa fa-times fa-2x"></i>Cerrar
+                                </button>
+                            </div>
+                       </div>
+                    </div>
+                </div>
+            </template>
+            <!-- Fin Ver Compra -->
         </div>
         <!-- Fin ejemplo de tabla Listado -->
     </div>
@@ -487,7 +574,38 @@
             },
 
             ocultarDetalle(){
-                this.listado=1;
+                this.listado = 1;
+                me.proveedor = '';
+                me.tipo_identificacion = 'FACTURA';
+                me.num_compra = '';
+                me.impuesto = 0.18;
+                me.total = 0.0;
+                me.arrayDetalle = [];
+            },
+
+            verCompra(id){
+                let me = this;
+                me.listado=2;
+                var compra
+                var url = 'compra/obtenerCompra?id='+id;
+                
+                axios.get(url).then(function (response) {
+                    // handle success
+                    //console.log(compra);
+                    var respuesta = response.data;
+                    compra = respuesta.compra[0];
+
+                    me.proveedor = compra.proveedor.nombre;
+                    me.num_compra = compra.num_compra;
+                    me.tipo_identificacion = compra.tipo_identificacion;
+                    me.impuesto = compra.impuesto;
+                    me.total = compra.total;
+                    me.arrayDetalle = compra.detalle_compra;
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
             },
 
             registrarCompra(){
@@ -680,7 +798,7 @@
                 })
             },
 
-            desactivarUsuario(id){
+            desactivarCompra(id){
                 const swalWithBootstrapButtons = Swal.mixin({
                         confirmButtonClass: 'btn btn-success',
                         cancelButtonClass: 'btn btn-danger',
@@ -688,7 +806,7 @@
                     })
 
                     swalWithBootstrapButtons({
-                    title: '¿Estás seguro de desactivar el usuario?',
+                    title: '¿Estás seguro de anular la compra?',
                     
                     // type: 'warning',
                     showCancelButton: true,
@@ -698,14 +816,14 @@
                     }).then((result) => {
                     if (result.value) {
                         let me=this;
-                        axios.put('usuario/desactivar',{
+                        axios.put('compra/desactivar',{
                             'id':id
                         }).then(function (response) {
                             // handle success   
-                            me.listarUsuario(1,'','nombre'); 
+                            me.listarCompra(1,'','num_comra'); 
                             swalWithBootstrapButtons.fire(
                                 '¡Desactivado!',
-                                'El registro a sido desactivado con éxito',
+                                'La compra a sido anulada con éxito',
                                 'success'
                             )
                         })

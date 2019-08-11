@@ -53,6 +53,31 @@ class CompraController extends Controller
         ];
     }
 
+    public function obtenerCompra(Request $request){
+        if(!$request->ajax()) return redirect('/');
+
+        $id = $request->id;
+        $compra = Compra::with('detalle_compra')
+                           ->with('detalle_compra.productos') 
+                           ->with('proveedor')
+                           ->where('id',$id)
+                           ->orderBy('id','desc')
+                           ->get();
+                                 
+        return [ 'compra' => $compra];                            
+    }
+
+    public function obtenerDetalles(Request $request){
+        if(!$request->ajax()) return redirect('/');
+
+        $id = $request->id;
+        $detalles = DetalleCompra::where('idcompra',$id)
+                                 ->orderBy('id','desc')
+                                 ->get();
+
+        return [ 'detalles' => $detalles];                            
+    }
+
     public function store(Request $request){
 
         if(!$request->ajax()) return redirect('/');

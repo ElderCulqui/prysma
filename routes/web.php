@@ -51,7 +51,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/compra', 'CompraController@index');
         Route::post('/compra/registrar', 'CompraController@store');
-        Route::get('/compra/desactivar', 'CompraController@desactivar');
+        Route::put('/compra/desactivar', 'CompraController@desactivar');
+        Route::get('/compra/obtenerCompra', 'CompraController@obtenerCompra');
     });
 
     Route::group(['middleware' => ['Vendedor','Administrador']], function () {

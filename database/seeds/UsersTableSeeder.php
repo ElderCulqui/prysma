@@ -14,8 +14,8 @@ class UsersTableSeeder extends Seeder
         DB::table('users')->insert([
             'idrol' => 1,
             'nombre' => 'Elder Orlando',
-            'usuario' => 'elder',
-            'password' => bcrypt('secret'),
+            'usuario' => 'admin',
+            'password' => bcrypt('admin'),
         ]);
     }
 }
