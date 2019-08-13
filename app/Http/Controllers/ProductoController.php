@@ -92,7 +92,7 @@ class ProductoController extends Controller
         if(!$request->ajax()) return redirect('/');
 
         $filtro = $request->filtro;
-        $productos = Producto::select('id','nombre')
+        $productos = Producto::with('categoria')
                             ->where('codigo',$filtro)
                             ->orderBy('nombre','asc')
                             ->take(1)

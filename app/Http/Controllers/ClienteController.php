@@ -61,4 +61,15 @@ class ClienteController extends Controller
         $cliente->email = $request->email;
         $cliente->save();
     }
+
+    public function selectCliente(Request $request){
+        if(!$request->ajax()) return redirect('/');
+
+        $filtro = $request->filtro;
+        $clientes = Cliente::where('nombre','like','%'.$filtro.'%')
+                            ->orderBy('id','asc')
+                            ->get();
+        
+        return [ 'clientes' => $clientes ];
+    }
 }
