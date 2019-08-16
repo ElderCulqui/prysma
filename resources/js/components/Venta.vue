@@ -167,7 +167,7 @@
                         </div>
                     </div>
                     <div class="form-group row border"> 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Producto <span class="text-error" v-show="idproducto==0">(*Ingrese código del producto)</span></label>
                                 <div class="form-inline">
@@ -193,6 +193,12 @@
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
+                                <label>Descuento</label>
+                                <input type="number" value="0" step="any" class="form-control" v-model="descuento">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
                                 <button @click="agregarDetalle()" class="btn btn-primary form-control btnagregar">
                                     <i class="fa fa-plus fa-2x"></i>Agregar Detalle
                                 </button>
@@ -201,7 +207,7 @@
                     </div>
                     <!-- <br><br> -->
                     <div class="form-grop row border">
-                        <h3>Lista de Ventas a Clientes</h3>
+                        <h3>Lista de Productos</h3>
                         
                         <div class="table-responsive col-md-12">
                             <table class="table table-bordered table-striped">
@@ -211,6 +217,7 @@
                                         <th>Producto</th>
                                         <th>Precio (S/.)</th>
                                         <th>Cantidad</th>
+                                        <th>Descuento</th>
                                         <th>Total (S/.)</th>
                                     </tr>
                                 </thead>
@@ -223,31 +230,40 @@
                                         </td>
                                         <td v-text="detalle.producto"></td>
                                         <td>
-                                            <input v-model="detalle.precio" type="number" value="3" class="form-control">
+                                            <input v-model="detalle.precio" type="number" class="form-control">
                                         </td>
                                         <td>
-                                            <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
+                                            <span style="color:red;" v-show="detalle.cantidad>detalle.stock">Stock: {{detalle.stock}}</span>
+                                            <input v-model="detalle.cantidad" type="number" class="form-control">
                                         </td>
                                         <td>
-                                            {{ detalle.precio * detalle.cantidad }}
+                                            <span style="color:red;" v-show="detalle.descuento>(detalle.precio*detalle.cantidad)">Descuento superior al total</span>
+                                            <input v-model="detalle.descuento" type="number" class="form-control">
+                                        </td>
+                                        <td>
+                                            {{ detalle.precio * detalle.cantidad - detalle.descuento }}
                                         </td>
                                     </tr>
                                     <tr style="background-color: grey;">
-                                        <td colspan="4" align="right"><strong>Sub-Total:</strong></td>
+                                        <td colspan="5" align="right"><strong>Sub-Total:</strong></td>
                                         <td><strong>S/. {{subTotal=(total-subTotalImpuesto).toFixed(2)}}</strong></td>
                                     </tr>
                                     <tr style="background-color: grey;">
-                                        <td colspan="4" align="right"><strong>Impuesto:</strong></td>
+                                        <td colspan="5" align="right"><strong>Impuesto:</strong></td>
                                         <td><strong>S/. {{subTotalImpuesto=((total*impuesto)/(1+impuesto)).toFixed(2)}}</strong></td>
                                     </tr>
                                     <tr style="background-color: grey;">
-                                        <td colspan="4" align="right"><strong>Total:</strong></td>
+                                        <td colspan="5" align="right"><strong>Descuento:</strong></td>
+                                        <td><strong>S/. {{subTotalDescuento=calcularDescuento}}</strong></td>
+                                    </tr>
+                                    <tr style="background-color: grey;">
+                                        <td colspan="5" align="right"><strong>Total:</strong></td>
                                         <td><strong>S/. {{total=calcularTotal}}</strong></td>
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             No se han agregado productos
                                         </td>
                                     </tr>
@@ -303,6 +319,7 @@
                                         <th>Producto</th>
                                         <th>Precio (S/.)</th>
                                         <th>Cantidad</th>
+                                        <th>Descuento</th>
                                         <th>Total (S/.)</th>   
                                     </tr>
                                 </thead>
@@ -311,26 +328,31 @@
                                         <td v-text="detalle.productos.nombre"></td>
                                         <td v-text="detalle.precio"></td>
                                         <td v-text="detalle.cantidad"></td>
+                                        <td v-text="detalle.descuento"></td>
                                         <td>
                                             {{ detalle.precio * detalle.cantidad }}
                                         </td>
                                     </tr>
                                     <tr style="background-color: grey;">
-                                        <td colspan="3" align="right"><strong>Sub-Total:</strong></td>
+                                        <td colspan="4" align="right"><strong>Sub-Total:</strong></td>
                                         <td><strong>S/.{{ subTotal=(total-subTotalImpuesto).toFixed(2) }}</strong></td>
                                     </tr>
                                     <tr style="background-color: grey;">
-                                        <td colspan="3" align="right"><strong>Impuesto:</strong></td>
+                                        <td colspan="4" align="right"><strong>Impuesto:</strong></td>
                                         <td><strong>S/.{{ subTotalImpuesto=((total*impuesto)/(1+impuesto)).toFixed(2) }}</strong></td>
                                     </tr>
                                     <tr style="background-color: grey;">
-                                        <td colspan="3" align="right"><strong>Total:</strong></td>
+                                        <td colspan="4" align="right"><strong>Descuento:</strong></td>
+                                        <td><strong>S/.{{ subTotalDescuento }}</strong></td>
+                                    </tr>
+                                    <tr style="background-color: grey;">
+                                        <td colspan="4" align="right"><strong>Total:</strong></td>
                                         <td><strong>S/.{{total}}</strong></td>
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="5">
                                             No se han agregado productos
                                         </td>
                                     </tr>
@@ -450,6 +472,7 @@
                 impuesto:0.18,
                 total:0.00,
                 subTotalImpuesto:0.00,
+                subTotalDescuento:0.00,
                 subTotal:0.00,
                 arrayVenta:[],
                 arrayCliente:[],
@@ -479,7 +502,8 @@
                 producto:'',
                 precio:0,
                 cantidad:0,
-                descuento:0
+                descuento:0,
+                stock:0,
 
             }    
         },
@@ -518,13 +542,21 @@
 
             },
 
+            calcularDescuento: function(){
+                var total_descuento = 0.0;
+                for(var i=0; i<this.arrayDetalle.length; i++){
+                    total_descuento = total_descuento + (this.arrayDetalle[i].descuento);  
+                }
+                return total_descuento;
+            },
             calcularTotal: function(){
                 var resultado = 0.0;
                 for(var i=0; i<this.arrayDetalle.length; i++){
-                    resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad);  
+                    resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad - this.arrayDetalle[i].descuento);  
                 }
                 return resultado;
             },
+
         },
 
         methods:{
@@ -651,7 +683,7 @@
 
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
-                    q:search
+                    q:searchstock
                     me.arrayCliente = respuesta.clientes;
                     console.log(respuesta)
                     loading(false)
@@ -680,6 +712,7 @@
                         me.producto = me.arrayProducto[0]['nombre'];
                         me.idproducto = me.arrayProducto[0]['id'];
                         me.precio = me.arrayProducto[0]['precio_venta'];
+                        me.stock = me.arrayProducto[0]['stock'];
                     }else{
                         me.producto = 'No existe el producto';
                         me.idproducto = 0;
@@ -714,17 +747,29 @@
                         })
                     }
                     else{
-                        me.arrayDetalle.push({
-                            idproducto: me.idproducto,
-                            producto: me.producto,
-                            cantidad: me.cantidad,
-                            precio: me.precio
-                        });
-                        me.codigo="";
-                        me.idproducto=0;
-                        me.producto="";
-                        me.cantidad=0;
-                        me.precio=0;
+                        if(me.cantidad>me.stock){
+                            swal({
+                                type: 'error',
+                                title: 'Error...',
+                                text: 'Stock insuficiente'
+                            })
+                        }
+                        else{
+                                me.arrayDetalle.push({
+                                idproducto: me.idproducto,
+                                producto: me.producto,
+                                cantidad: me.cantidad,
+                                descuento: me.descuento,
+                                precio: me.precio
+                            });
+                            me.codigo="";
+                            me.idproducto=0;
+                            me.producto="";
+                            me.cantidad=0;
+                            me.descuento=0;
+                            me.precio=0;
+                            me.stock=0;
+                        }
                     }
                 }
             },
@@ -748,7 +793,9 @@
                         idproducto: data['id'],
                         producto: data['nombre'],
                         cantidad: 1,
-                        precio: data['precio_venta']
+                        precio: data['precio_venta'],
+                        descuento: 0,
+                        stock: data['stock'],
                     })
                 }
             },
