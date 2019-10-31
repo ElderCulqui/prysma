@@ -675,6 +675,7 @@
                     if(me.arrayProducto.length > 0){
                         me.producto = me.arrayProducto[0]['nombre'];
                         me.idproducto = me.arrayProducto[0]['id'];
+                        me.precio = me.arrayProducto[0]['precio_venta'];
                     }else{
                         me.producto = 'No existe el producto';
                         me.idproducto = 0;
@@ -743,7 +744,7 @@
                         idproducto: data['id'],
                         producto: data['nombre'],
                         cantidad: 1,
-                        precio: 1
+                        precio: data['precio_venta']
                     })
                 }
             },

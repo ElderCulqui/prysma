@@ -90,7 +90,7 @@ class VentaController extends Controller
                     $detalle->idproducto = $value['idproducto'];
                     $detalle->cantidad = $value['cantidad'];
                     $detalle->precio = $value['precio'];
-                    $detalle->descuento = 1;
+                    $detalle->descuento = $value['descuento'];
                     $detalle->save();
                 }
 

@@ -545,9 +545,9 @@
             calcularDescuento: function(){
                 var total_descuento = 0.0;
                 for(var i=0; i<this.arrayDetalle.length; i++){
-                    total_descuento = total_descuento + (this.arrayDetalle[i].descuento);  
+                    total_descuento = total_descuento + parseInt(this.arrayDetalle[i].descuento);  
                 }
-                return total_descuento;
+                return parseInt(total_descuento);
             },
             calcularTotal: function(){
                 var resultado = 0.0;
@@ -683,7 +683,7 @@
 
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
-                    q:searchstock
+                    // q:searchstock
                     me.arrayCliente = respuesta.clientes;
                     console.log(respuesta)
                     loading(false)
