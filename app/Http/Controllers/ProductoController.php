@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Producto;
 use App\Categoria;
+use PDF;
 
 class ProductoController extends Controller
 {
@@ -123,5 +124,14 @@ class ProductoController extends Controller
         }
 
         return ['productos' => $productos];
+    }
+
+    public function listarPDF()
+    {
+        $productos = Producto::get();
+
+        $pdf = PDF::loadView('pdf.productospdf', ['productos' => $productos]);
+
+        return $pdf->download('productos.pdf');
     }
 }

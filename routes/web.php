@@ -39,6 +39,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/producto/activar', 'ProductoController@activar');
         Route::get('/producto/buscarProducto', 'ProductoController@buscarProducto');
         Route::get('/producto/listarProducto', 'ProductoController@listarProducto');
+        Route::get('/producto/listarPDF', 'ProductoController@listarPDF')->name('productos_pdf');
     });
     
     Route::group(['middleware' => ['Comprador','Administrador']], function () {
@@ -66,6 +67,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/venta/registrar', 'VentaController@store');
         Route::put('/venta/desactivar', 'VentaController@desactivar');
         Route::get('/venta/obtenerVenta', 'VentaController@obtenerVenta');
+        Route::get('/venta/pdf/{id}', 'VentaController@pdf')->name('venta_pdf');
     });
 
     Route::group(['middleware' => ['Administrador']], function () {

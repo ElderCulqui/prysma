@@ -14,6 +14,9 @@
                 <button class="btn btn-primary btn-lg" type="button" @click="abrirModal('producto','registrar')">
                     <i class="fa fa-plus fa-2x"></i>&nbsp;&nbsp;Agregar Producto
                 </button>
+                <button type="button" class="btn btn-success btn-lg" @click="cargarPdf()">
+                    <i class="fa fa-file fa-2x"></i>&nbsp;&nbsp;Reporte PDF
+                </button>
             </div>
             <div class="card-body">
                 <div class="form-group row">
@@ -269,6 +272,11 @@
                     // handle error
                     console.log(error);
                 })
+            },
+
+            cargarPdf()
+            {
+                window.open('/producto/listarPDF','_blank');
             },
 
             selectCategoria(){

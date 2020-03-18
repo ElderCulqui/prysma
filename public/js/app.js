@@ -3527,6 +3527,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3605,6 +3608,9 @@ __webpack_require__.r(__webpack_exports__);
         // handle error
         console.log(error);
       });
+    },
+    cargarPdf: function cargarPdf() {
+      window.open('/producto/listarPDF', '_blank');
     },
     selectCategoria: function selectCategoria() {
       var me = this;
@@ -5448,6 +5454,9 @@ __webpack_require__.r(__webpack_exports__);
         // handle error
         console.log(error);
       });
+    },
+    pdfVenta: function pdfVenta(id) {
+      window.open('/venta/pdf/' + id + ',' + '_blank');
     },
     cambiarPagina: function cambiarPagina(page, buscar, criterio) {
       var me = this;
@@ -34107,6 +34116,23 @@ var render = function() {
             [
               _c("i", { staticClass: "fa fa-plus fa-2x" }),
               _vm._v("  Agregar Producto\n                ")
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-success btn-lg",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.cargarPdf()
+                }
+              }
+            },
+            [
+              _c("i", { staticClass: "fa fa-file fa-2x" }),
+              _vm._v("  Reporte PDF\n                ")
             ]
           )
         ]),

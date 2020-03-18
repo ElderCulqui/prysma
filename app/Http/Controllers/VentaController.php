@@ -8,6 +8,7 @@ use Auth;
 use App\Venta;
 use App\DetalleVenta;
 use Carbon\Carbon;
+use PDF;
 
 class VentaController extends Controller
 {
@@ -107,5 +108,14 @@ class VentaController extends Controller
         $venta = Venta::findOrFail($request->id);
         $venta->estado = 'Anulado';
         $venta->save();
+    }
+
+    public function pdf($id)
+    {
+        $venta = Venta::find($id);
+
+        $pdf = PDF::loadView('pdf.ventapdf', ['venta' => $venta]);
+
+        return $pdf->download('venta-'.$venta->num_venta.'.pdf');
     }
 }

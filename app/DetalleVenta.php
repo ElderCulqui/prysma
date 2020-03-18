@@ -20,7 +20,7 @@ class DetalleVenta extends Model
         return $this->belongTo('App\Venta','idventa');
     }
 
-    public function productos(){
+    public function producto(){
         return $this->belongsTo('App\Producto','idproducto');
     }
 }
