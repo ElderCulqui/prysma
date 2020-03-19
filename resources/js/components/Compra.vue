@@ -546,6 +546,10 @@
                 })
             },
 
+            pdfCompra(id){
+                window.open('/compra/pdf/'+id+','+'_blank');
+            },
+
             cambiarPagina(page,buscar,criterio){
                 let me = this;
 

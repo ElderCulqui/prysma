@@ -10,6 +10,7 @@
     <title>PRYSMA</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js">
     <link href="{{ URL::asset('css/plantilla.css') }}" rel="stylesheet">
 </head>
 

@@ -19,6 +19,7 @@ Route::group(['middleware' => ['guest']], function () {
 Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/logout','Auth\LoginController@logout')->name('logout');
+    Route::get('/dashboard','DashboardController');
 
     Route::get('/main', function () {
         return view('contenido.contenido');
@@ -54,6 +55,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/compra/registrar', 'CompraController@store');
         Route::put('/compra/desactivar', 'CompraController@desactivar');
         Route::get('/compra/obtenerCompra', 'CompraController@obtenerCompra');
+        Route::get('/compra/pdf/{id}', 'CompraController@pdf')->name('compra_pdf');
     });
 
     Route::group(['middleware' => ['Vendedor','Administrador']], function () {

@@ -101,7 +101,7 @@
        
     </style>
     <body>
-        {{-- @foreach ($venta as $v) --}}
+        {{-- @foreach ($compra as $v) --}}
         <header>
             <!--<div id="logo">
                 <img src="img/logo.png" alt="" id="imagen">
@@ -112,24 +112,24 @@
                 <table id="datos">
                     <thead>                        
                         <tr>
-                            <th id="">DATOS DEL CLIENTE</th>
+                            <th id="">DATOS DEL PROVEEDOR</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <th><p id="proveedor">Nombre: {{$venta->cliente->nombre ?? '-'}}<br>
-                            {{$venta->cliente->tipo_documento}}: {{$venta->cliente->num_documento}}<br>
-                            Dirección: {{$venta->cliente->direccion}}<br>
-                            Teléfono: {{$venta->cliente->telefono}}<br>
-                            Email: {{$venta->cliente->email}}</</p></th>
+                            <th><p id="proveedor">Nombre: {{$compra->proveedor->nombre ?? '-'}}<br>
+                            {{$compra->proveedor->tipo_documento}}: {{$compra->proveedor->num_documento}}<br>
+                            Dirección: {{$compra->proveedor->direccion}}<br>
+                            Teléfono: {{$compra->proveedor->telefono}}<br>
+                            Email: {{$compra->proveedor->email}}</</p></th>
                         </tr>
                     </tbody>
                 </table>
             </div>
             
             <div id="fact">
-                <p>{{$venta->tipo_identificacion}}-VENTA<br>
-                  {{$venta->num_venta}}</p>
+                <p>{{$compra->tipo_identificacion}}-COMPRA<br>
+                  {{$compra->num_compra}}</p>
             </div>
         </header>
         <br>
@@ -142,46 +142,62 @@
                 <table id="facproducto">
                     <thead>
                         <tr id="fa">
+                            <th>COMPRADOR</th>
+                            <th>FECHA COMPRA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{$compra->usuario->nombre}}</td>
+                            <td>{{$compra->created_at}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <table id="facproducto">
+                    <thead>
+                        <tr id="fa">
                             <th>CANTIDAD</th>
                             <th>PRODUCTO</th>
-                            <th>PRECIO VENTA (USD$)</th>
-                            <th>DESCUENTO</th>
+                            <th>PRECIO COMPRA (USD$)</th>
+                            {{-- <th>DESCUENTO</th> --}}
                             <th>PRECIO TOTAL (USD$)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($venta->detalle_venta as $det)
+                        @foreach ($compra->detalle_compra as $det)
                         <tr>
                             <td>{{$det->cantidad}}</td>
                             <td>{{$det->producto->nombre}}</td>
                             <td>{{$det->precio}}</td>
-                            <td>{{$det->descuento}}</td>
-                            <td>{{$det->cantidad*$det->precio-$det->descuento}}</td>
+                            {{-- <td>{{$det->descuento}}</td> --}}
+                            <td>{{$det->cantidad*$det->precio}}</td>
                         </tr>
                         @endforeach
                     </tbody>
                     <tfoot>
-                        {{-- @foreach ($venta as $v) --}}
+                        {{-- @foreach ($compra as $v) --}}
                         <tr>
                             <th></th>
                             <th></th>
-                            <th></th>
+                            {{-- <th></th> --}}
                             <th>SUBTOTAL</th>
-                            <td>USD$ {{round($venta->total-($venta->total*$venta->impuesto),2)}}</td>
+                            <td>USD$ {{round($compra->total-($compra->total*$compra->impuesto),2)}}</td>
                         </tr>
                         <tr>
                             <th></th>
                             <th></th>
-                            <th></th>
+                            {{-- <th></th> --}}
                             <th>Impuesto</th>
-                            <td>USD$ {{round($venta->total*$venta->impuesto,2)}}</td>
+                            <td>USD$ {{round($compra->total*$compra->impuesto,2)}}</td>
                         </tr>
                         <tr>
                             <th></th>
                             <th></th>
-                            <th></th>
+                            {{-- <th></th> --}}
                             <th>TOTAL</th>
-                            <td>USD$ {{$venta->total}}</td>
+                            <td>USD$ {{$compra->total}}</td>
                         </tr>
                         {{-- @endforeach --}}
                     </tfoot>

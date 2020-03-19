@@ -8,6 +8,7 @@ use Auth;
 use App\Compra;
 use App\DetalleCompra;
 use Carbon\Carbon;
+use PDF;
 
 class CompraController extends Controller
 {
@@ -108,5 +109,14 @@ class CompraController extends Controller
         $compra = Compra::findOrFail($request->id);
         $compra->estado = 'Anulado';
         $compra->save();
+    }
+
+    public function pdf($id) 
+    {
+        $compra = Compra::find($id);
+
+        $pdf = PDF::loadView('pdf.comprapdf', ['compra' => $compra]);
+
+        return $pdf->download('compra-'.$compra->num_compra.'.pdf');
     }
 }
