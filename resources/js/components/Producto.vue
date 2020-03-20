@@ -39,6 +39,7 @@
                             <th>Codigo</th>
                             <th>Precio Venta (USD$)</th>
                             <th>Stock</th>
+                            <th>Imagen</th>
                             <th>Estado</th>
                             <th>Editar</th>
                             <th>Cambiar Estado</th>
@@ -53,6 +54,9 @@
                             <td v-text="producto.codigo"></td>
                             <td v-text="producto.precio_venta"></td>
                             <td v-text="producto.stock"></td>
+                            <td>
+                                <img :src="'img/producto/' + producto.imagen" class="img-responsive" width="100px" height="100px">
+                            </td>
                             <td>
                                 <button type="button" class="btn btn-success btn-md" v-if="producto.condicion">
                                   <i class="fa fa-check fa-2x"></i> Activo
@@ -170,7 +174,21 @@
                             </div>
                         </div>
 
+                        <div class="form group row">
+                            <label class="col-md-3 form-control-label" for="imagen-input">Imagen</label>
+                            <div class="col-md-9">
 
+                                <div v-if="tipoAccion==1">
+                                    <input type="file" @change="subirImagen" class="form-control">
+                                    <img :src="imagen" class="image-responsive" width="100px" height="100px">
+                                </div>
+
+                                <div v-if="tipoAccion==2">
+                                    <input type="file" @change="subirImagen" class="form-control">
+                                    <img :src="imagen" class="image-responsive" width="100px" height="100px">
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -199,6 +217,7 @@
                 codigo:'',
                 precio_venta:0,
                 stock:0,
+                imagen:'',
                 tituloModal:'',
                 arrayProducto:[],
                 modal:0,
@@ -304,6 +323,17 @@
                 me.listarProducto(page,buscar,criterio);
             },
 
+            subirImagen(e) {
+                let me = this;
+                let file = e.target.files[0];
+                let reader = new FileReader();
+
+                reader.onloadend = (file) => {
+                    me.imagen = reader.result;
+                }
+                reader.readAsDataURL(file);
+            },
+
             registrarProducto(){
 
                 if(this.validarProducto()){
@@ -318,6 +348,7 @@
                     'nombre':this.nombre,
                     'precio_venta':this.precio_venta,
                     'stock':this.stock,
+                    'imagen':this.imagen,
                 }).then(function (response) {
                     // handle success
                     // console.log(response);
@@ -343,6 +374,7 @@
                     'nombre':this.nombre,
                     'precio_venta':this.precio_venta,
                     'stock':this.stock,
+                    'imagen':this.imagen,
                     'id':this.producto_id
                 }).then(function (response) {
                     // handle success
@@ -451,6 +483,7 @@
                 if(!this.codigo) this.errorMostrarMsjProducto.push("(*)El codigo del producto no puede estar vacío");
                 if(!this.precio_venta) this.errorMostrarMsjProducto.push("(*)El precio de venta del producto no puede estar vacío");
                 if(!this.stock) this.errorMostrarMsjProducto.push("(*)El stock del producto no puede estar vacío");
+                if(!this.imagen) this.errorMostrarMsjProducto.push("(*)La imagen del producto no puede estar vacío");
                 if(this.errorMostrarMsjProducto.length) this.errorProducto=1;
 
                 return this.errorProducto;
@@ -464,6 +497,7 @@
                 this.codigo="";
                 this.precio_venta="";
                 this.stock="";
+                this.imagen="";
                 this.errorProducto=0;
             },
 
@@ -520,6 +554,7 @@
     }
 
     .mostrar{
+        height: 1000px;
         display:list-item !important;
         opacity:1 !important;
         position:absolute !important;

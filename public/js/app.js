@@ -2973,6 +2973,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3692,6 +3696,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3702,6 +3724,7 @@ __webpack_require__.r(__webpack_exports__);
       codigo: '',
       precio_venta: 0,
       stock: 0,
+      imagen: '',
       tituloModal: '',
       arrayProducto: [],
       modal: 0,
@@ -3792,6 +3815,17 @@ __webpack_require__.r(__webpack_exports__);
       me.pagination.current_page = page;
       me.listarProducto(page, buscar, criterio);
     },
+    subirImagen: function subirImagen(e) {
+      var me = this;
+      var file = e.target.files[0];
+      var reader = new FileReader();
+
+      reader.onloadend = function (file) {
+        me.imagen = reader.result;
+      };
+
+      reader.readAsDataURL(file);
+    },
     registrarProducto: function registrarProducto() {
       if (this.validarProducto()) {
         return;
@@ -3803,7 +3837,8 @@ __webpack_require__.r(__webpack_exports__);
         'codigo': this.codigo,
         'nombre': this.nombre,
         'precio_venta': this.precio_venta,
-        'stock': this.stock
+        'stock': this.stock,
+        'imagen': this.imagen
       }).then(function (response) {
         // handle success
         // console.log(response);
@@ -3826,6 +3861,7 @@ __webpack_require__.r(__webpack_exports__);
         'nombre': this.nombre,
         'precio_venta': this.precio_venta,
         'stock': this.stock,
+        'imagen': this.imagen,
         'id': this.producto_id
       }).then(function (response) {
         // handle success
@@ -3909,6 +3945,7 @@ __webpack_require__.r(__webpack_exports__);
       if (!this.codigo) this.errorMostrarMsjProducto.push("(*)El codigo del producto no puede estar vacío");
       if (!this.precio_venta) this.errorMostrarMsjProducto.push("(*)El precio de venta del producto no puede estar vacío");
       if (!this.stock) this.errorMostrarMsjProducto.push("(*)El stock del producto no puede estar vacío");
+      if (!this.imagen) this.errorMostrarMsjProducto.push("(*)La imagen del producto no puede estar vacío");
       if (this.errorMostrarMsjProducto.length) this.errorProducto = 1;
       return this.errorProducto;
     },
@@ -3920,6 +3957,7 @@ __webpack_require__.r(__webpack_exports__);
       this.codigo = "";
       this.precio_venta = "";
       this.stock = "";
+      this.imagen = "";
       this.errorProducto = 0;
     },
     abrirModal: function abrirModal(modelo, accion) {
@@ -5046,6 +5084,10 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-select */ "./node_modules/vue-select/dist/vue-select.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_select__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
 //
 //
 //
@@ -8663,7 +8705,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.modal-content{\n    width:100% !important;\n    position:absolute !important;\n}\n.mostrar{\n    display:list-item !important;\n    opacity:1 !important;\n    position:absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error{\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n    font-size: 20px;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content{\n    width:100% !important;\n    position:absolute !important;\n}\n.mostrar{\n    height: 1000px;\n    display:list-item !important;\n    opacity:1 !important;\n    position:absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error{\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n    font-size: 20px;\n}\n", ""]);
 
 // exports
 
@@ -33891,6 +33933,17 @@ var render = function() {
                             }),
                             _vm._v(" "),
                             _c("td", [
+                              _c("img", {
+                                staticClass: "img-responsive",
+                                attrs: {
+                                  src: "img/producto/" + producto.imagen,
+                                  width: "100px",
+                                  height: "100px"
+                                }
+                              })
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
                               producto.condicion
                                 ? _c(
                                     "button",
@@ -34227,6 +34280,8 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Stock")]),
         _vm._v(" "),
+        _c("th", [_vm._v("Imagen")]),
+        _vm._v(" "),
         _c("th", [_vm._v("Estado")]),
         _vm._v(" "),
         _c("th", [_vm._v("Acción")])
@@ -34468,6 +34523,17 @@ var render = function() {
                     _c("td", {
                       domProps: { textContent: _vm._s(producto.stock) }
                     }),
+                    _vm._v(" "),
+                    _c("td", [
+                      _c("img", {
+                        staticClass: "img-responsive",
+                        attrs: {
+                          src: "img/producto/" + producto.imagen,
+                          width: "100px",
+                          height: "100px"
+                        }
+                      })
+                    ]),
                     _vm._v(" "),
                     _c("td", [
                       producto.condicion
@@ -34981,6 +35047,57 @@ var render = function() {
                           }
                         })
                       ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form group row" }, [
+                      _c(
+                        "label",
+                        {
+                          staticClass: "col-md-3 form-control-label",
+                          attrs: { for: "imagen-input" }
+                        },
+                        [_vm._v("Imagen")]
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-9" }, [
+                        _vm.tipoAccion == 1
+                          ? _c("div", [
+                              _c("input", {
+                                staticClass: "form-control",
+                                attrs: { type: "file" },
+                                on: { change: _vm.subirImagen }
+                              }),
+                              _vm._v(" "),
+                              _c("img", {
+                                staticClass: "image-responsive",
+                                attrs: {
+                                  src: _vm.imagen,
+                                  width: "100px",
+                                  height: "100px"
+                                }
+                              })
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.tipoAccion == 2
+                          ? _c("div", [
+                              _c("input", {
+                                staticClass: "form-control",
+                                attrs: { type: "file" },
+                                on: { change: _vm.subirImagen }
+                              }),
+                              _vm._v(" "),
+                              _c("img", {
+                                staticClass: "image-responsive",
+                                attrs: {
+                                  src: _vm.imagen,
+                                  width: "100px",
+                                  height: "100px"
+                                }
+                              })
+                            ])
+                          : _vm._e()
+                      ])
                     ])
                   ]
                 )
@@ -35077,6 +35194,8 @@ var staticRenderFns = [
         _c("th", [_vm._v("Precio Venta (USD$)")]),
         _vm._v(" "),
         _c("th", [_vm._v("Stock")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Imagen")]),
         _vm._v(" "),
         _c("th", [_vm._v("Estado")]),
         _vm._v(" "),
@@ -38627,6 +38746,17 @@ var render = function() {
                             }),
                             _vm._v(" "),
                             _c("td", [
+                              _c("img", {
+                                staticClass: "img-responsive",
+                                attrs: {
+                                  src: "img/producto/" + producto.imagen,
+                                  width: "100px",
+                                  height: "100px"
+                                }
+                              })
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
                               producto.condicion
                                 ? _c(
                                     "button",
@@ -38982,6 +39112,8 @@ var staticRenderFns = [
         _c("th", [_vm._v("Precio Venta (USD$)")]),
         _vm._v(" "),
         _c("th", [_vm._v("Stock")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Imagen")]),
         _vm._v(" "),
         _c("th", [_vm._v("Estado")]),
         _vm._v(" "),

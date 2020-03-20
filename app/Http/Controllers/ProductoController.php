@@ -56,6 +56,21 @@ class ProductoController extends Controller
         $producto->precio_venta = $request->precio_venta;
         $producto->stock = $request->stock;
         $producto->condicion = '1';
+
+        $exploded = explode(',', $request->imagen);
+        $decoded = base64_decode($exploded[1]);
+
+        if(str_contains($exploded[0],'jpeg')) {
+            $extension = 'jpg';
+        } else {
+            $extension = 'png';
+        }
+
+        $fileName = str_random().'.'.$extension;
+        $path = public_path().'/img/producto/'.$fileName;
+        file_put_contents($path,$decoded);
+        $producto->imagen = $fileName;
+
         $producto->save();
     }
 
@@ -69,6 +84,34 @@ class ProductoController extends Controller
         $producto->precio_venta = $request->precio_venta;
         $producto->stock = $request->stock;
         $producto->condicion = '1';
+
+        $currentPhoto = $producto->imagen;
+
+        if($request->imagen != $currentPhoto) {
+            $exploded = explode(',', $request->imagen);
+            $decoded = base64_decode($exploded[1]);
+
+            if(str_contains($exploded[0],'jpeg')) {
+                $extension = 'jpg';
+            } else {
+                $extension = 'png';
+            }
+
+            $fileName = str_random().'.'.$extension;
+            $path = public_path().'/img/producto/'.$fileName;
+            file_put_contents($path,$decoded);
+
+            // Eliminar foto del servidor
+
+            $productoImagen = public_path('/img/producto/').$currentPhoto;
+
+            if (file_exists($productoImagen)) {
+                @unlink($productoImagen);
+            }
+            
+            $producto->imagen = $fileName;
+        }
+
         $producto->save();
     }
 
