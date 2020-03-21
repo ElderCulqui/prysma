@@ -4777,6 +4777,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4789,6 +4809,7 @@ __webpack_require__.r(__webpack_exports__);
       telefono: '',
       email: '',
       usuario: '',
+      imagen: '',
       password: '',
       tituloModal: '',
       arrayUsuario: [],
@@ -4856,6 +4877,17 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       });
     },
+    subirImagen: function subirImagen(e) {
+      var me = this;
+      var file = e.target.files[0];
+      var reader = new FileReader();
+
+      reader.onloadend = function (file) {
+        me.imagen = reader.result;
+      };
+
+      reader.readAsDataURL(file);
+    },
     cambiarPagina: function cambiarPagina(page, buscar, criterio) {
       var me = this;
       me.pagination.current_page = page;
@@ -4876,6 +4908,7 @@ __webpack_require__.r(__webpack_exports__);
         'telefono': this.telefono,
         'email': this.email,
         'usuario': this.usuario,
+        'imagen': this.imagen,
         'password': this.password
       }).then(function (response) {
         // handle success
@@ -4902,6 +4935,7 @@ __webpack_require__.r(__webpack_exports__);
         'telefono': this.telefono,
         'email': this.email,
         'usuario': this.usuario,
+        'imagen': this.imagen,
         'password': this.password,
         'id': this.proveedor_id
       }).then(function (response) {
@@ -4999,6 +5033,7 @@ __webpack_require__.r(__webpack_exports__);
       if (!this.tipo_documento) this.errorMostrarMsjUsuario.push("(*)El tipo de documento del Usuario no puede estar vacío");
       if (!this.num_documento) this.errorMostrarMsjUsuario.push("(*)El numero de documento del Usuario no puede estar vacío");
       if (!this.usuario) this.errorMostrarMsjUsuario.push("(*)El usuario no puede estar vacío");
+      if (!this.imagen) this.errorMostrarMsjUsuario.push("(*)La imagen del usuario no puede estar vacío");
       if (this.errorMostrarMsjUsuario.length) this.errorUsuario = 1;
       return this.errorUsuario;
     },
@@ -5014,6 +5049,7 @@ __webpack_require__.r(__webpack_exports__);
       this.password = "";
       this.usuario = "";
       this.idrol = "";
+      this.imagen = "";
       this.errorUsuario = 0;
     },
     abrirModal: function abrirModal(modelo, accion) {
@@ -8762,7 +8798,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.modal-content{\n    width:100% !important;\n    position:absolute !important;\n}\n.mostrar{\n    display:list-item !important;\n    opacity:1 !important;\n    position:absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error{\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n    font-size: 20px;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content{\n    width:100% !important;\n    position:absolute !important;\n}\n.mostrar{\n    height: 1000px;\n    display:list-item !important;\n    opacity:1 !important;\n    position:absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error{\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n    font-size: 20px;\n}\n", ""]);
 
 // exports
 
@@ -36417,6 +36453,17 @@ var render = function() {
                     }),
                     _vm._v(" "),
                     _c("td", [
+                      _c("img", {
+                        staticClass: "img-responsive",
+                        attrs: {
+                          src: "img/usuario/" + usuario.imagen,
+                          width: "100px",
+                          height: "100px"
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [
                       usuario.condicion
                         ? _c(
                             "button",
@@ -37057,6 +37104,57 @@ var render = function() {
                           }
                         })
                       ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form group row" }, [
+                      _c(
+                        "label",
+                        {
+                          staticClass: "col-md-3 form-control-label",
+                          attrs: { for: "imagen-input" }
+                        },
+                        [_vm._v("Imagen")]
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-9" }, [
+                        _vm.tipoAccion == 1
+                          ? _c("div", [
+                              _c("input", {
+                                staticClass: "form-control",
+                                attrs: { type: "file" },
+                                on: { change: _vm.subirImagen }
+                              }),
+                              _vm._v(" "),
+                              _c("img", {
+                                staticClass: "image-responsive",
+                                attrs: {
+                                  src: _vm.imagen,
+                                  width: "100px",
+                                  height: "100px"
+                                }
+                              })
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.tipoAccion == 2
+                          ? _c("div", [
+                              _c("input", {
+                                staticClass: "form-control",
+                                attrs: { type: "file" },
+                                on: { change: _vm.subirImagen }
+                              }),
+                              _vm._v(" "),
+                              _c("img", {
+                                staticClass: "image-responsive",
+                                attrs: {
+                                  src: _vm.imagen,
+                                  width: "100px",
+                                  height: "100px"
+                                }
+                              })
+                            ])
+                          : _vm._e()
+                      ])
                     ])
                   ]
                 )
@@ -37157,6 +37255,8 @@ var staticRenderFns = [
         _c("th", [_vm._v("Email")]),
         _vm._v(" "),
         _c("th", [_vm._v("Usuario")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Imagen")]),
         _vm._v(" "),
         _c("th", [_vm._v("Estado")]),
         _vm._v(" "),

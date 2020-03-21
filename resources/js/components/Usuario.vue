@@ -40,6 +40,7 @@
                             <th>Teléfono</th>
                             <th>Email</th>
                             <th>Usuario</th>
+                            <th>Imagen</th>
                             <th>Estado</th>
                             <th>Editar</th>
                             <th>Cambiar Estado</th>
@@ -56,6 +57,9 @@
                             <td v-text="usuario.telefono"></td>
                             <td v-text="usuario.email"></td>
                             <td v-text="usuario.usuario"></td>
+                            <td>
+                                <img :src="'img/usuario/' + usuario.imagen" class="img-responsive" width="100px" height="100px">
+                            </td>
                             <td>
                                 <button type="button" class="btn btn-success btn-md" v-if="usuario.condicion">
                                   <i class="fa fa-check fa-2x"></i> Activo
@@ -200,6 +204,22 @@
                                
                             </div>
                         </div>
+
+                        <div class="form group row">
+                            <label class="col-md-3 form-control-label" for="imagen-input">Imagen</label>
+                            <div class="col-md-9">
+
+                                <div v-if="tipoAccion==1">
+                                    <input type="file" @change="subirImagen" class="form-control">
+                                    <img :src="imagen" class="image-responsive" width="100px" height="100px">
+                                </div>
+
+                                <div v-if="tipoAccion==2">
+                                    <input type="file" @change="subirImagen" class="form-control">
+                                    <img :src="imagen" class="image-responsive" width="100px" height="100px">
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -230,6 +250,7 @@
                 telefono:'',
                 email:'',
                 usuario:'',
+                imagen:'',
                 password:'',
                 tituloModal:'',
                 arrayUsuario:[],
@@ -304,6 +325,17 @@
                 })
             },
 
+            subirImagen(e) {
+                let me = this;
+                let file = e.target.files[0];
+                let reader = new FileReader();
+
+                reader.onloadend = (file) => {
+                    me.imagen = reader.result;
+                }
+                reader.readAsDataURL(file);
+            },
+
             cambiarPagina(page,buscar,criterio){
                 let me = this;
 
@@ -329,6 +361,7 @@
                     'telefono':this.telefono,
                     'email':this.email,
                     'usuario':this.usuario,
+                    'imagen':this.imagen,
                     'password':this.password,
                 }).then(function (response) {
                     // handle success
@@ -358,6 +391,7 @@
                     'telefono':this.telefono,
                     'email':this.email,
                     'usuario':this.usuario,
+                    'imagen':this.imagen,
                     'password':this.password,
                     'id':this.proveedor_id,
                 }).then(function (response) {
@@ -484,6 +518,7 @@
                 if(!this.tipo_documento) this.errorMostrarMsjUsuario.push("(*)El tipo de documento del Usuario no puede estar vacío");
                 if(!this.num_documento) this.errorMostrarMsjUsuario.push("(*)El numero de documento del Usuario no puede estar vacío");
                 if(!this.usuario) this.errorMostrarMsjUsuario.push("(*)El usuario no puede estar vacío");
+                if(!this.imagen) this.errorMostrarMsjUsuario.push("(*)La imagen del usuario no puede estar vacío");
                 if(this.errorMostrarMsjUsuario.length) this.errorUsuario=1;
 
                 return this.errorUsuario;
@@ -501,6 +536,7 @@
                 this.password="";
                 this.usuario="";
                 this.idrol="";
+                this.imagen="";
                 this.errorUsuario=0;
             },
 
@@ -565,6 +601,7 @@
     }
 
     .mostrar{
+        height: 1000px;
         display:list-item !important;
         opacity:1 !important;
         position:absolute !important;

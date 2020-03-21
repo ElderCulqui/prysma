@@ -58,6 +58,21 @@ class UserController extends Controller
         $usuario->usuario = $request->usuario;
         $usuario->password = bcrypt($request->password);
         $usuario->condicion = 1;
+
+        $exploded = explode(',', $request->imagen);
+        $decoded = base64_decode($exploded[1]);
+
+        if(str_contains($exploded[0],'jpeg')) {
+            $extension = 'jpg';
+        } else {
+            $extension = 'png';
+        }
+
+        $fileName = str_random().'.'.$extension;
+        $path = public_path().'/img/usuario/'.$fileName;
+        file_put_contents($path,$decoded);
+        $usuario->imagen = $fileName;
+
         $usuario->save();
     }
 
@@ -73,10 +88,40 @@ class UserController extends Controller
         $usuario->telefono = $request->telefono;
         $usuario->email = $request->email;
         $usuario->usuario = $request->usuario;
-        if($request->password !== null || $request->password !== '' ){
+        if($request->password != null || $request->password != '' ){
             $usuario->password = bcrypt($request->password);
         }
         $usuario->condicion = 1;
+
+        $currentPhoto = $usuario->imagen;
+        $exploded = explode(',', $request->imagen);
+        $decoded = base64_decode($exploded[1]);
+
+        if($request->imagen != $currentPhoto) {
+            $exploded = explode(',', $request->imagen);
+            $decoded = base64_decode($exploded[1]);
+
+            if(str_contains($exploded[0],'jpeg')) {
+                $extension = 'jpg';
+            } else {
+                $extension = 'png';
+            }
+
+            $fileName = str_random().'.'.$extension;
+            $path = public_path().'/img/usuario/'.$fileName;
+            file_put_contents($path,$decoded);
+
+            // Eliminar foto del servidor
+
+            $usuarioImagen = public_path('/img/usuario/').$currentPhoto;
+
+            if (file_exists($usuarioImagen)) {
+                @unlink($usuarioImagen);
+            }
+            
+            $usuario->imagen = $fileName;
+        }
+
         $usuario->save();
     }
 
